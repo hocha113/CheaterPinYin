@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="..\tModLoader.targets" />
+	<PropertyGroup>
+		<AssemblyName>CheaterPinYin</AssemblyName>
+		<LangVersion>latest</LangVersion>
+	</PropertyGroup>
+	<ItemGroup>
+		<Reference Include="hyjiacan.py4n">
+			<HintPath>lib\hyjiacan.py4n.dll</HintPath>
+		</Reference>
+		<Reference Include="InnoVault">
+		  <HintPath>..\InnoVault\bin\Debug\net8.0\InnoVault.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+</Project>
