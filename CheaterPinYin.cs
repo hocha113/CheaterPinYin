@@ -1,3 +1,4 @@
+using Terraria;
 using Terraria.ModLoader;
 
 namespace CheaterPinYin
@@ -5,6 +6,7 @@ namespace CheaterPinYin
     public class CheaterPinYin : Mod
 	{
         internal delegate void textbox_KeyPressed_Delegate(object obj, object sender, char key);
+        internal delegate Item[] getItem_Delegate(object obj);
 
         internal static CheaterPinYin Instance => (CheaterPinYin)ModLoader.GetMod("CheaterPinYin");
 
@@ -16,7 +18,7 @@ namespace CheaterPinYin
             CheatSheetItemSearchModifier.Instance = new CheatSheetItemSearchModifier();
             CheatSheetNPCSearchModifier.Instance = new CheatSheetNPCSearchModifier();
             CheatSheetRecipeSearchModifier.Instance = new CheatSheetRecipeSearchModifier();
-            HEROsSearchModifier.Instance = new HEROsSearchModifier();
+            HEROsItemSearchModifier.Instance = new HEROsItemSearchModifier();
             if (cheatSheet != null) {
                 CheatSheetItemSearchModifier.Instance.LoadItemBrowserInfo();
                 CheatSheetItemSearchModifier.Instance.LoadHook_ItemBrowser_textbox_KeyPressed();
@@ -24,6 +26,9 @@ namespace CheaterPinYin
                 CheatSheetNPCSearchModifier.Instance.LoadHook_NPCBrowser_textbox_KeyPressed();
                 CheatSheetRecipeSearchModifier.Instance.LoadRecipeBrowserInfo();
                 CheatSheetRecipeSearchModifier.Instance.LoadHook_RecipeBrowser_textbox_KeyPressed();
+            }
+            if (heros != null) {
+                HEROsItemSearchModifier.Instance.LoadHook();
             }
         }
 
@@ -33,7 +38,7 @@ namespace CheaterPinYin
             CheatSheetItemSearchModifier.Unload();
             CheatSheetNPCSearchModifier.Unload();
             CheatSheetRecipeSearchModifier.Unload();
-            HEROsSearchModifier.UnLoad();
+            HEROsItemSearchModifier.UnLoad();
         }
 
         internal void FindMod() {

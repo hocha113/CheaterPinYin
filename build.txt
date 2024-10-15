@@ -1,6 +1,9 @@
 displayName = Cheater PinYin Vault
 dllReferences = hyjiacan.py4n
 modReferences = InnoVault@1.1
-sortAfter = InnoVault, CheatSheet
+sortAfter = InnoVault, CheatSheet, HEROsMod
 author = HoCha113
 version = 0.1
+homepage = https://github.com/hocha113/CheaterPinYin
+buildIgnore = .vs\*, Properties\*, *.csproj, *.user, obj\*, bin\*, *.config, .git\*
+hideCode = false
