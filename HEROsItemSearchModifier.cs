@@ -1,7 +1,6 @@
 ﻿using hyjiacan.py4n;
 using InnoVault;
 using Microsoft.Xna.Framework;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,6 +31,7 @@ namespace CheaterPinYin
         internal static Array defaultSorts_ArrayValue;
         internal static FieldInfo selectedSort_Field;
         internal static object selectedSort_Instance;
+        internal static FieldInfo selectedSort_Sort_Field;
 
         internal static PropertyInfo selectedCategory_Property;
         internal static object selectedCategory_Instance;
@@ -105,14 +105,13 @@ namespace CheaterPinYin
             if (availableSorts_Field == null) {
                 availableSorts_Field = itemBrowserType.GetField("AvailableSorts", BindingFlags.Instance | BindingFlags.NonPublic);
             }
-            if (availableSorts_ArrayValue == null) {
-                availableSorts_ArrayValue = (Array)availableSorts_Field.GetValue(obj);
-            }
+            //不要懒加载
+            availableSorts_ArrayValue = (Array)availableSorts_Field.GetValue(obj);
         }
 
-        internal void Get_SlotInfo(object item) {
+        internal void Get_SlotInfo() {
             if (slot_Type == null) {
-                slot_Type = item.GetType();
+                slot_Type = selectedSort_Instance.GetType();
             }
             if (slot_button_Field == null) {
                 slot_button_Field = slot_Type.GetField("button", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -123,7 +122,6 @@ namespace CheaterPinYin
         }
 
         internal void SetForegroundColorInItem(object item, Color newColor) {
-            Get_SlotInfo(item);
             if (item == null) {
                 return;
             }
@@ -135,14 +133,14 @@ namespace CheaterPinYin
             if (selectedSort_Field == null) {
                 selectedSort_Field = itemBrowserType.GetField("SelectedSort", BindingFlags.NonPublic | BindingFlags.Instance);
             }
-            if (selectedSort_Instance == null) {
-                selectedSort_Instance = selectedSort_Field.GetValue(obj);
-            }
+            selectedSort_Instance = selectedSort_Field.GetValue(obj);
             if (defaultSorts_Property == null) {
                 defaultSorts_Property = itemBrowserType.GetProperty("DefaultSorts", BindingFlags.Public | BindingFlags.Static);
             }
-            if (defaultSorts_ArrayValue == null) {
-                defaultSorts_ArrayValue = (Array)defaultSorts_Property.GetValue(obj);
+            //这个最好也不要懒加载
+            defaultSorts_ArrayValue = (Array)defaultSorts_Property.GetValue(obj);
+            if (selectedSort_Instance == null) {
+                SetSelectedSort_Instance_Give_DefaultSorts(obj);
             }
         }
 
@@ -150,18 +148,15 @@ namespace CheaterPinYin
             if (selectedCategory_Property == null) {
                 selectedCategory_Property = itemBrowserType.GetProperty("SelectedCategory", BindingFlags.NonPublic | BindingFlags.Instance);
             }
-            if (selectedCategory_Instance == null) {
-                selectedCategory_Instance = selectedCategory_Property.GetValue(obj);
-            }
+            //这个最好也不要懒加载
+            selectedCategory_Instance = selectedCategory_Property.GetValue(obj);
         }
 
         internal void Get_Categories(object obj) {
             if (categories_Property == null) {
                 categories_Property = itemBrowserType.GetProperty("Categories", BindingFlags.Public | BindingFlags.Static);
             }
-            if (categories_ArrayValue == null) {
-                categories_ArrayValue = (Array)categories_Property.GetValue(obj);
-            }
+            categories_ArrayValue = (Array)categories_Property.GetValue(obj);
         }
 
         internal Item[] Run_Categories_InGetItem(object category) {
@@ -178,9 +173,7 @@ namespace CheaterPinYin
             if (searchBox_Field == null) {
                 searchBox_Field = itemBrowserType.GetField("SearchBox", BindingFlags.Public | BindingFlags.Instance);
             }
-            if (searchBox_Instance == null) {
-                searchBox_Instance = searchBox_Field.GetValue(obj);
-            }
+            searchBox_Instance = searchBox_Field.GetValue(obj);
             if (searchBox_Text_Property == null) {
                 searchBox_Text_Property = searchBox_Instance.GetType().GetProperty("Text", BindingFlags.Public | BindingFlags.Instance);
             }
@@ -200,49 +193,71 @@ namespace CheaterPinYin
             return (bool)passFilters_Method.Invoke(obj, [item]);
         }
 
-        internal void Run_comparer_Sort(List<Item> result) {
-            //result.Sort(new MyComparer(this));
+        internal void Run_ResetSlot(List<Item> result) {
+            selectedSort_Sort_Field = selectedSort_Instance.GetType().GetField("sort", BindingFlags.Public | BindingFlags.Instance);
+            Func<Item, Item, int> func = (Func<Item, Item, int>)selectedSort_Sort_Field.GetValue(selectedSort_Instance);
+            result.Sort((Item a, Item b) => func(a, b));
+        }
+
+        internal void SetSelectedSort_Instance_Give_DefaultSorts(object obj) {
+            object defaultSorts = defaultSorts_ArrayValue.GetValue(0);
+            selectedSort_Instance = defaultSorts;
+            selectedSort_Field.SetValue(obj, defaultSorts);
         }
 
         private void on_textbox_KeyPressed_Hook(textbox_KeyPressed_Delegate orig, object obj, object sender, char key) {
+            Get_searchBox(obj);
+
             string _searchBoxText = (string)searchBox_Text_Property.GetValue(searchBox_Instance);
+            string _searchBoxText_NoAir = _searchBoxText.Replace(" ", "");
+            PinyinFormat pinyinFormat = PinyinFormat.LOWERCASE | PinyinFormat.WITHOUT_TONE;
+            // 获取用户输入的拼音
+            string userInputPinyin = Pinyin4Net.GetPinyin(_searchBoxText, pinyinFormat, false, false, false).ToLower().Replace(" ", "");
 
             if (_searchBoxText.Length > 0) {
                 bool match = false;
-                foreach (Item item in Get_currentItems(obj)) {
-                    if (item.Name.ToLower().IndexOf(_searchBoxText, StringComparison.OrdinalIgnoreCase) != -1) {
+                Item[] currentItems = Get_currentItems(obj);
+                foreach (Item item in currentItems) {
+                    if (SearchUtility.ItemMatching(item.Name, _searchBoxText, userInputPinyin)) {
                         match = true;
                         break;
                     }
                 }
-                if (!match) {
+                if (!match && _searchBoxText_NoAir.Length >= 15) {
                     _searchBoxText = _searchBoxText.Substring(0, _searchBoxText.Length - 1);
+                    searchBox_Text_Property.SetValue(searchBox_Instance, _searchBoxText);
                 }
             }
+
+            Get_selectedCategory_Property(obj);
             //???这是在干什么，老实说让属性自己等于自己才能让程序正常，这似乎类似于一种迭代手法
             selectedCategory_Property.SetValue(obj, selectedCategory_Property.GetValue(obj));
         }
 
         private Item[] on_GetItems_Hook(getItem_Delegate orig, object obj) {
+            Get_selectedCategory_Property(obj);
             Get_AvailableSorts(obj);
+            Get_SelectedSort(obj);
+            Get_searchBox(obj);
+            Get_SlotInfo();
+
+            string _searchBoxText = (string)searchBox_Text_Property.GetValue(searchBox_Instance);
+            string _searchBoxText_NoAir = _searchBoxText.Replace(" ", "");
 
             foreach (var item in availableSorts_ArrayValue) {
                 SetForegroundColorInItem(item, Color.Gray);
             }
 
-            Get_SelectedSort(obj);
-
-            if (selectedSort_Instance == null || Array.IndexOf(availableSorts_ArrayValue, selectedSort_Instance) == -1) {
-                selectedSort_Field.SetValue(obj, defaultSorts_ArrayValue.GetValue(0));
+            if (selectedSort_Instance == null || Array.IndexOf(availableSorts_ArrayValue, selectedSort_Instance) != -1) {
+                SetSelectedSort_Instance_Give_DefaultSorts(obj);
             }
 
             SetForegroundColorInItem(selectedSort_Instance, Color.White);
 
             List<Item> result = new List<Item>();
 
-            Get_selectedCategory_Property(obj);
-            Get_Categories(obj);
             if (selectedCategory_Instance == null) {
+                Get_Categories(obj);
                 foreach (var category in categories_ArrayValue) {
                     Item[] items = Run_Categories_InGetItem(category);
                     foreach (Item item in items) {
@@ -254,34 +269,26 @@ namespace CheaterPinYin
                 result = Run_Categories_InGetItem(selectedCategory_Instance).ToList();
             }
 
-            Get_searchBox(obj);
-
             PinyinFormat pinyinFormat = PinyinFormat.LOWERCASE | PinyinFormat.WITHOUT_TONE;
-
-            string _searchBoxText = (string)searchBox_Text_Property.GetValue(searchBox_Instance);
             // 获取用户输入的拼音
             string userInputPinyin = Pinyin4Net.GetPinyin(_searchBoxText, pinyinFormat, false, false, false).ToLower().Replace(" ", "");
 
-            List<Item> newList = [];
+            //在这里先一步去重，减少性能开销
+            result = result.Distinct().ToList();
+            List<Item> newResult = [];
             foreach (var item in result) {
-                if (SearchUtility.ItemMatching(item.Name, _searchBoxText, userInputPinyin)) {
-                    newList.Add(item);
+                if (!SearchUtility.ItemMatching(item.Name, _searchBoxText, userInputPinyin)) {
+                    continue;
                 }
-            }
-            result = newList;
-
-            List<Item> newList2 = [];
-            foreach (var item in result) {
-                if (Run_PassFilters(obj, item)) {
-                    newList2.Add(item);
+                if (!Run_PassFilters(obj, item)) {
+                    continue;
                 }
+                newResult.Add(item);
             }
 
-            result = newList2;
+            Run_ResetSlot(newResult);
 
-            Run_comparer_Sort(result);
-
-            return result.ToArray();
+            return newResult.ToArray();
         }
     }
 }
