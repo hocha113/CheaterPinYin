@@ -53,7 +53,7 @@ namespace CheaterPinYin
             }
         }
 
-        internal string Reflection_GetTextbox_Text_PropertyValue(object obj) {
+        internal string GetTextbox_Text_Property(object obj) {
             object textbox_Instance = textbox_FieldInfo.GetValue(obj);
             Type textbox_Type = textbox_Instance.GetType();
 
@@ -120,7 +120,7 @@ namespace CheaterPinYin
         }
 
         private void on_textbox_KeyPressed_Hook(textbox_KeyPressed_Delegate orig, object obj, object sender, char key) {
-            string textbox_TextValue = Reflection_GetTextbox_Text_PropertyValue(obj);
+            string textbox_TextValue = GetTextbox_Text_Property(obj);
 
             int[] itemView_activeSlotsValue = Get_activeSlots_Field(obj);
             int[] itemView_selectedCategoryValue = Get_selectedCategory_Property(obj);
