@@ -92,10 +92,7 @@ namespace CheaterPinYin
             }
         }
 
-        internal string GetTextbox_Text_Property(object obj) {
-            LoadTextboxInfo(obj);
-            return (string)textbox_Text_Property.GetValue(textbox_Instance);
-        }
+        internal string GetTextbox_Text_Property(object obj) => (string)textbox_Text_Property.GetValue(textbox_Instance);
 
         private void LoadItemViewInfo(object obj) {
             if (itemView_Instance == null) {
@@ -121,25 +118,13 @@ namespace CheaterPinYin
             }
         }
 
-        internal int[] Get_activeSlots_Field(object obj) {
-            LoadItemViewInfo(obj);
-            return (int[])activeSlots_FieldInfo.GetValue(itemView_Instance);
-        }
+        internal int[] Get_activeSlots_Field(object obj) => (int[])activeSlots_FieldInfo.GetValue(itemView_Instance);
 
-        internal void Set_activeSlots_Field(object obj, int[] newList) {
-            LoadItemViewInfo(obj);
-            activeSlots_FieldInfo.SetValue(itemView_Instance, newList);
-        }
+        internal void Set_activeSlots_Field(object obj, int[] newList) => activeSlots_FieldInfo.SetValue(itemView_Instance, newList);
 
-        internal int[] Get_selectedCategory_Property(object obj) {
-            LoadItemViewInfo(obj);
-            return (int[])selectedCategory_Property.GetValue(itemView_Instance);
-        }
+        internal int[] Get_selectedCategory_Property(object obj) => (int[])selectedCategory_Property.GetValue(itemView_Instance);
 
-        internal void Run_itemView_ReorderSlots_MethodValue(object obj) {
-            LoadItemViewInfo(obj);
-            reorderSlots_Method.Invoke(itemView_Instance, null);
-        }
+        internal void Run_itemView_ReorderSlots_MethodValue(object obj) => reorderSlots_Method.Invoke(itemView_Instance, null);
 
         private void LoadSlotInfo(object slot_Instance) {
             if (slot_Type == null) {
@@ -152,7 +137,6 @@ namespace CheaterPinYin
 
         //性能开销主要来自于这个函数中的反射操作，如何降低这个函数的调用复杂度是重中之重
         internal string Get_Slot_ItemName(object obj, int index) {
-            LoadItemViewInfo(obj);
             object slot_Instance = allItemsSlots_ArrayValue.GetValue(index);
             LoadSlotInfo(slot_Instance);
             return ((Item)slot_Item_FieldInfo.GetValue(slot_Instance)).Name.ToLower();
@@ -160,13 +144,16 @@ namespace CheaterPinYin
 
         internal void HanderStrLengs(object obj, string textbox_TextValue) {
             if (textbox_TextValue.Length >= 15) {
-                LoadTextboxInfo(obj);
                 textbox_Text_Property.SetValue(textbox_Instance, textbox_TextValue.Substring(0, textbox_TextValue.Length - 1));
             }
         }
 
         private void on_textbox_KeyPressed_Hook(textbox_KeyPressed_Delegate orig, object obj, object sender, char key) {
+            LoadTextboxInfo(obj);
+
             string textbox_TextValue = GetTextbox_Text_Property(obj);
+
+            LoadItemViewInfo(obj);
 
             int[] itemView_activeSlotsValue = Get_activeSlots_Field(obj);
             int[] itemView_selectedCategoryValue = Get_selectedCategory_Property(obj);

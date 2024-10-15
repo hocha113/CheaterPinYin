@@ -93,12 +93,9 @@ namespace CheaterPinYin
             }
         }
 
-        internal string GetTextbox_Text_Property(object obj) {
-            LoadTextboxInfo(obj);
-            return (string)textbox_Text_Property.GetValue(textbox_Instance);
-        }
+        internal string GetTextbox_Text_Property(object obj) => (string)textbox_Text_Property.GetValue(textbox_Instance);
 
-        private void LoadNPCViewInfo(object obj) {
+        private void LoadRecipeViewInfo(object obj) {
             if (recipeView_Instance == null) {
                 recipeView_Instance = recipeView_FieldInfo.GetValue(obj);
             }
@@ -122,25 +119,13 @@ namespace CheaterPinYin
             }
         }
 
-        internal int[] Get_activeSlots_Field(object obj) {
-            LoadNPCViewInfo(obj);
-            return (int[])activeSlots_FieldInfo.GetValue(recipeView_Instance);
-        }
+        internal int[] Get_activeSlots_Field(object obj) => (int[])activeSlots_FieldInfo.GetValue(recipeView_Instance);
 
-        internal void Set_activeSlots_Field(object obj, int[] newList) {
-            LoadNPCViewInfo(obj);
-            activeSlots_FieldInfo.SetValue(recipeView_Instance, newList);
-        }
+        internal void Set_activeSlots_Field(object obj, int[] newList) => activeSlots_FieldInfo.SetValue(recipeView_Instance, newList);
 
-        internal int[] Get_selectedCategory_Property(object obj) {
-            LoadNPCViewInfo(obj);
-            return (int[])selectedCategory_Property.GetValue(recipeView_Instance);
-        }
+        internal int[] Get_selectedCategory_Property(object obj) => (int[])selectedCategory_Property.GetValue(recipeView_Instance);
 
-        internal void Run_recipeView_ReorderSlots_MethodValue(object obj) {
-            LoadNPCViewInfo(obj);
-            reorderSlots_Method.Invoke(recipeView_Instance, null);
-        }
+        internal void Run_recipeView_ReorderSlots_MethodValue(object obj) => reorderSlots_Method.Invoke(recipeView_Instance, null);
 
         private void LoadSlotInfo(object slot_Instance) {
             if (slot_Type == null) {
@@ -153,7 +138,6 @@ namespace CheaterPinYin
 
         //性能开销主要来自于这个函数中的反射操作，如何降低这个函数的调用复杂度是重中之重
         internal string Get_Slot_ItemName(object obj, int index) {
-            LoadNPCViewInfo(obj);
             object slot_Instance = allRecipeSlot_ArrayValue.GetValue(index);
             LoadSlotInfo(slot_Instance);
             return ((Recipe)slot_Recipe_FieldInfo.GetValue(slot_Instance)).createItem.Name.ToLower();
@@ -161,13 +145,16 @@ namespace CheaterPinYin
 
         internal void HanderStrLengs(object obj, string textbox_TextValue) {
             if (textbox_TextValue.Length >= 15) {
-                LoadTextboxInfo(obj);
                 textbox_Text_Property.SetValue(textbox_Instance, textbox_TextValue.Substring(0, textbox_TextValue.Length - 1));
             }
         }
 
         private void on_textbox_KeyPressed_Hook(textbox_KeyPressed_Delegate orig, object obj, object sender, char key) {
+            LoadTextboxInfo(obj);
+
             string textbox_TextValue = GetTextbox_Text_Property(obj);
+
+            LoadRecipeViewInfo(obj);
 
             int[] npcView_activeSlotsValue = Get_activeSlots_Field(obj);
             int[] npcView_selectedCategoryValue = Get_selectedCategory_Property(obj);
