@@ -55,6 +55,11 @@ namespace CheaterPinYin
             CheatSheetRecipeSearchModifier.Instance = null;
         }
 
+        internal void LoadHook() {
+            LoadRecipeBrowserInfo();
+            LoadHook_RecipeBrowser_textbox_KeyPressed();
+        }
+
         internal void LoadRecipeBrowserInfo() {
             recipeBrowserWindowType = null;
 

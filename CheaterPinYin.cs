@@ -19,16 +19,16 @@ namespace CheaterPinYin
             CheatSheetNPCSearchModifier.Instance = new CheatSheetNPCSearchModifier();
             CheatSheetRecipeSearchModifier.Instance = new CheatSheetRecipeSearchModifier();
             HEROsItemSearchModifier.Instance = new HEROsItemSearchModifier();
+            HEROsNPCSpawnerSearchModifier.Instance = new HEROsNPCSpawnerSearchModifier();
             if (cheatSheet != null) {
-                CheatSheetItemSearchModifier.Instance.LoadItemBrowserInfo();
-                CheatSheetItemSearchModifier.Instance.LoadHook_ItemBrowser_textbox_KeyPressed();
-                CheatSheetNPCSearchModifier.Instance.LoadNPCBrowserInfo();
-                CheatSheetNPCSearchModifier.Instance.LoadHook_NPCBrowser_textbox_KeyPressed();
-                CheatSheetRecipeSearchModifier.Instance.LoadRecipeBrowserInfo();
-                CheatSheetRecipeSearchModifier.Instance.LoadHook_RecipeBrowser_textbox_KeyPressed();
+                CheatSheetItemSearchModifier.Instance.LoadHook();
+                CheatSheetNPCSearchModifier.Instance.LoadHook();
+                CheatSheetRecipeSearchModifier.Instance.LoadHook();
             }
             if (heros != null) {
                 HEROsItemSearchModifier.Instance.LoadHook();
+                //这个存在一个暂时没能解决的问题，所以在当前版本不进行挂载
+                //HEROsNPCSpawnerSearchModifier.Instance.LoadHook();
             }
         }
 
@@ -39,6 +39,7 @@ namespace CheaterPinYin
             CheatSheetNPCSearchModifier.Unload();
             CheatSheetRecipeSearchModifier.Unload();
             HEROsItemSearchModifier.UnLoad();
+            HEROsNPCSpawnerSearchModifier.UnLoad();
         }
 
         internal void FindMod() {

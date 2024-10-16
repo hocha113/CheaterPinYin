@@ -54,6 +54,11 @@ namespace CheaterPinYin
             CheatSheetItemSearchModifier.Instance = null;
         }
 
+        internal void LoadHook() {
+            LoadItemBrowserInfo();
+            LoadHook_ItemBrowser_textbox_KeyPressed();
+        }
+
         internal void LoadItemBrowserInfo() {
             itemBrowserType = null;
 

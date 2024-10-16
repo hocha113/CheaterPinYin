@@ -56,6 +56,11 @@ namespace CheaterPinYin
             CheatSheetNPCSearchModifier.Instance = null;
         }
 
+        internal void LoadHook() {
+            LoadNPCBrowserInfo();
+            LoadHook_NPCBrowser_textbox_KeyPressed();
+        }
+
         internal void LoadNPCBrowserInfo() {
             npcBrowserType = null;
 
