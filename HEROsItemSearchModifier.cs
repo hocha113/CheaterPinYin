@@ -223,7 +223,7 @@ namespace CheaterPinYin
                         break;
                     }
                 }
-                if (!match && _searchBoxText_NoAir.Length >= 15) {
+                if (!match && SearchUtility.GetActualLength(_searchBoxText_NoAir) >= CheaterPinYinConfig.Instance.CharactersMaxNum) {
                     _searchBoxText = _searchBoxText.Substring(0, _searchBoxText.Length - 1);
                     searchBox_Text_Property.SetValue(searchBox_Instance, _searchBoxText);
                 }

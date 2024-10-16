@@ -1,6 +1,7 @@
 ﻿using hyjiacan.py4n;
 using System.Text;
 using System;
+using System.Text.RegularExpressions;
 
 namespace CheaterPinYin
 {
@@ -36,6 +37,21 @@ namespace CheaterPinYin
                 return true;
             }
 
+            // 如果启用了正则表达式匹配，尝试匹配物品名称和物品名称的拼音
+            if (CheaterPinYinConfig.Instance.RegularExpression) {
+                // 创建一个匹配用户输入的正则表达式
+                Regex regex = new Regex(userInputPinyin, RegexOptions.IgnoreCase);
+                // 使用正则表达式匹配拼音
+                if (regex.IsMatch(itemNamePinyin)) {
+                    return true;
+                }
+                // 使用正则表达式匹配物品名称
+                regex = new Regex(userInput, RegexOptions.IgnoreCase);
+                if (regex.IsMatch(itemName)) {
+                    return true;
+                }
+            }
+
             return false;
         }
 
@@ -53,5 +69,22 @@ namespace CheaterPinYin
 
             return initials.ToString();
         }
+
+        internal static int GetActualLength(string input) {
+            int actualLength = 0;
+
+            foreach (char currentChar in input) {
+                // 如果字符是汉字或全角字符，占2位；否则占1位
+                if (currentChar > 0xFF) {
+                    actualLength += 2;
+                }
+                else {
+                    actualLength += 1;
+                }
+            }
+
+            return actualLength;
+        }
+
     }
 }

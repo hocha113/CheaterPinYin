@@ -5,6 +5,9 @@
 		<LangVersion>latest</LangVersion>
 	</PropertyGroup>
 	<ItemGroup>
+	  <None Remove="localization\zh-Hans_Mods.CheaterPinYin.hjson" />
+	</ItemGroup>
+	<ItemGroup>
 		<Reference Include="hyjiacan.py4n">
 			<HintPath>lib\hyjiacan.py4n.dll</HintPath>
 		</Reference>

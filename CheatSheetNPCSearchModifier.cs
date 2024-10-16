@@ -154,7 +154,7 @@ namespace CheaterPinYin
         }
 
         internal void HanderStrLengs(object obj, string textbox_TextValue) {
-            if (textbox_TextValue.Length >= 15) {
+            if (SearchUtility.GetActualLength(textbox_TextValue) >= CheaterPinYinConfig.Instance.CharactersMaxNum) {
                 textbox_Text_Property.SetValue(textbox_Instance, textbox_TextValue.Substring(0, textbox_TextValue.Length - 1));
             }
         }

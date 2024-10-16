@@ -1,1 +1,15 @@
+Configs: {
+	CheaterPinYinConfig: {
+		DisplayName: Client Configuration
 
+		CharactersMaxNum: {
+			Label: Characters Max Num
+			Tooltip: ""
+		}
+
+		RegularExpression: {
+			Label: Regular Expression
+			Tooltip: ""
+		}
+	}
+}

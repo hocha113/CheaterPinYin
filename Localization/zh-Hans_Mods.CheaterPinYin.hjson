@@ -1,0 +1,15 @@
+Configs: {
+	CheaterPinYinConfig: {
+        DisplayName: Client Configuration
+    
+        CharactersMaxNum: {
+            Label: Maximum Character Count in Input Box
+            Tooltip: "The maximum number of characters that can be entered in the input box. One half-width character (e.g., English letters) counts as 1, while one full-width character (e.g., Chinese characters) counts as 2."
+        }
+    
+        RegularExpression: {
+            Label: Enable Regular Expression
+            Tooltip: "Allows users to use regular expressions to match items. Not recommended for inexperienced users."
+        }
+    }
+}
