@@ -248,7 +248,7 @@ namespace CheaterPinYin
                 SetForegroundColorInItem(item, Color.Gray);
             }
 
-            if (selectedSort_Instance == null || Array.IndexOf(availableSorts_ArrayValue, selectedSort_Instance) != -1) {
+            if (selectedSort_Instance == null || Array.IndexOf(availableSorts_ArrayValue, selectedSort_Instance) == -1) {
                 SetSelectedSort_Instance_Give_DefaultSorts(obj);
             }
 
