@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using Terraria;
 using Terraria.ModLoader;
 using static CheaterPinYin.CheaterPinYin;
@@ -217,8 +218,9 @@ namespace CheaterPinYin
             if (_searchBoxText.Length > 0) {
                 bool match = false;
                 Item[] currentItems = Get_currentItems(obj);
+                Regex regex = SearchUtility.SafeGetRegex(_searchBoxText);
                 foreach (Item item in currentItems) {
-                    if (SearchUtility.ItemMatching(item.Name, _searchBoxText, userInputPinyin)) {
+                    if (SearchUtility.ItemMatching(item.Name, _searchBoxText, userInputPinyin, regex)) {
                         match = true;
                         break;
                     }
@@ -276,8 +278,11 @@ namespace CheaterPinYin
             //在这里先一步去重，减少性能开销
             result = result.Distinct().ToList();
             List<Item> newResult = [];
+
+            Regex regex = SearchUtility.SafeGetRegex(_searchBoxText);
+
             foreach (var item in result) {
-                if (!SearchUtility.ItemMatching(item.Name, _searchBoxText, userInputPinyin)) {
+                if (!SearchUtility.ItemMatching(item.Name, _searchBoxText, userInputPinyin, regex)) {
                     continue;
                 }
                 if (!Run_PassFilters(obj, item)) {

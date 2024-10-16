@@ -3,6 +3,7 @@ using InnoVault;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using Terraria;
 using Terraria.ModLoader;
 using static CheaterPinYin.CheaterPinYin;
@@ -115,10 +116,10 @@ namespace CheaterPinYin
                 PinyinFormat pinyinFormat = PinyinFormat.LOWERCASE | PinyinFormat.WITHOUT_TONE;
                 // 获取用户输入的拼音
                 string userInputPinyin = Pinyin4Net.GetPinyin(_textbox_Text, pinyinFormat, false, false, false).ToLower().Replace(" ", "");
-
+                Regex regex = SearchUtility.SafeGetRegex(_textbox_Text);
                 foreach (var npc in (Array)category_Value) {
                     string npcName = ((string)npcStats_Name_Property.GetValue(npc)).ToLower();
-                    if (SearchUtility.ItemMatching(npcName, _textbox_Text, userInputPinyin)) {
+                    if (SearchUtility.ItemMatching(npcName, _textbox_Text, userInputPinyin, regex)) {
                         npcStatsList_Add_Method.Invoke(matches, [npc]);
                     }
                 }

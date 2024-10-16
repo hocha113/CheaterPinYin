@@ -8,6 +8,7 @@ using Terraria.ModLoader;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria;
+using System.Text.RegularExpressions;
 
 namespace CheaterPinYin
 {
@@ -182,12 +183,13 @@ namespace CheaterPinYin
             string userInputPinyin = Pinyin4Net.GetPinyin(userInput, pinyinFormat, false, false, false).ToLower().Replace(" ", "");
 
             if (noAirInput.Length > 0) {//如果输入的全是空格那么就别搜索来浪费性能了
+                Regex regex = SearchUtility.SafeGetRegex(userInput);
                 for (int i = 0; i < category.Length; i++) {
                     int num = category[i];
                     string itemName = Get_Slot_ItemName(obj, num);
 
                     // 比较物品名称和输入内容以及它们的拼音
-                    if (SearchUtility.ItemMatching(itemName, userInput, userInputPinyin)) {
+                    if (SearchUtility.ItemMatching(itemName, userInput, userInputPinyin, regex)) {
                         list.Add(num);
                     }
                 }

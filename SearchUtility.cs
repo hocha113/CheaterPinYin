@@ -2,12 +2,13 @@
 using System.Text;
 using System;
 using System.Text.RegularExpressions;
+using Terraria;
 
 namespace CheaterPinYin
 {
     internal static class SearchUtility
     {
-        internal static bool ItemMatching(string itemName, string userInput, string userInputPinyin) {
+        internal static bool ItemMatching(string itemName, string userInput, string userInputPinyin, Regex regex = null) {
             // 先检查物品名称是否直接匹配用户输入
             if (itemName.IndexOf(userInput, StringComparison.Ordinal) != -1) {
                 return true;
@@ -36,23 +37,20 @@ namespace CheaterPinYin
             if (itemNameInitials.IndexOf(userInput, StringComparison.Ordinal) != -1) {
                 return true;
             }
-
-            // 如果启用了正则表达式匹配，尝试匹配物品名称和物品名称的拼音
-            if (CheaterPinYinConfig.Instance.RegularExpression) {
-                // 创建一个匹配用户输入的正则表达式
-                Regex regex = new Regex(userInputPinyin, RegexOptions.IgnoreCase);
-                // 使用正则表达式匹配拼音
-                if (regex.IsMatch(itemNamePinyin)) {
-                    return true;
-                }
-                // 使用正则表达式匹配物品名称
-                regex = new Regex(userInput, RegexOptions.IgnoreCase);
-                if (regex.IsMatch(itemName)) {
-                    return true;
-                }
+            
+            // 如果启用了正则表达式匹配
+            if (CheaterPinYinConfig.Instance.RegularExpression && regex != null && regex.IsMatch(itemName)) {
+                return true;
             }
 
             return false;
+        }
+
+        internal static Regex SafeGetRegex(string input) {
+            if (!CheaterPinYinConfig.Instance.RegularExpression) {
+                return null;
+            }
+            return new Regex(input, RegexOptions.IgnoreCase);
         }
 
         // 提取每个汉字的首字母，并返回首字母组成的字符串
@@ -68,6 +66,14 @@ namespace CheaterPinYin
             }
 
             return initials.ToString();
+        }
+
+        // 定义一个方法用于验证用户输入是否合法
+        private static bool IsValidInput(string input) {
+            // 可以根据需要定义合法字符的正则表达式
+            // 这里假设只允许字母、数字、汉字和下划线
+            Regex validInputRegex = new Regex(@"^[a-zA-Z0-9_\u4e00-\u9fa5]*$", RegexOptions.IgnoreCase);
+            return validInputRegex.IsMatch(input);
         }
 
         internal static int GetActualLength(string input) {

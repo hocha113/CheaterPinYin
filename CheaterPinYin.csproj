@@ -5,6 +5,7 @@
 		<LangVersion>latest</LangVersion>
 	</PropertyGroup>
 	<ItemGroup>
+	  <None Remove="description_workshop.txt" />
 	  <None Remove="localization\zh-Hans_Mods.CheaterPinYin.hjson" />
 	</ItemGroup>
 	<ItemGroup>
